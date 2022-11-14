@@ -34,7 +34,7 @@ describe(" GET /api/topics ", () => {
         expect(topics.length).toBe(3);
       });
   });
-  test.only("GET - status:404, not found", () => {
+  test("GET - status:404, not found", () => {
     return request(app)
       .get("/api/topics/badrequest")
       .expect(404)
