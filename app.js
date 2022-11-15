@@ -1,9 +1,7 @@
 const express = require("express");
-const { handlePSQLErrors } = require("./controller/errror.controller");
+const { handlePSQLErrors } = require("./errors");
 const { getTopics } = require("./controller/news.controller");
 const app = express();
-
-app.use(express.json());
 
 app.get("/api/topics", getTopics);
 
