@@ -11,7 +11,7 @@ app.all("/*", (req, res) => {
   res.status(404).send({ msg: "invalid URL!" });
 });
 app.use((err, req, res, next) => {
-  if (err.status && err.status) {
+  if (err.status && err.msg) {
     res.status(err.status).send({ msg: err.msg });
   }
 });
