@@ -9,7 +9,10 @@ exports.getTopics = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  fetchedArticles().then((articles) => {
-    res.status(200).send({ articles });
-  });
+  const { sort_by } = req.query;
+  fetchedArticles(sort_by)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch(next);
 };
