@@ -93,6 +93,7 @@ describe("/api/articles/:article_id", () => {
       .expect(200)
       .then((res) => {
         const { result } = res.body;
+        console.log(result);
         expect(result).toMatchObject({
           author: expect.any(String),
           title: expect.any(String),
