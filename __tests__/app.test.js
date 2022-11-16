@@ -77,6 +77,7 @@ describe("/api/articles", () => {
   });
   test("GET - status:404, not found", () => {
     return request(app)
+
       .get("/api/articlesbadrequest")
       .expect(404)
       .then((res) => {
@@ -120,3 +121,4 @@ describe("/api/articles/:article_id", () => {
       });
   });
 });
+
