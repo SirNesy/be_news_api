@@ -23,3 +23,17 @@ exports.fetchedArticles = (sort_by = "created_at") => {
     return response.rows;
   });
 };
+
+exports.fetchArticleById = (article_id) => {
+  if (!isNaN(article_id)) {
+    return db
+      .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
+      .then((result) => {
+        return result.rows[0];
+      });
+  }
+  return Promise.reject({
+    status: 400,
+    msg: "invalid sort query!",
+  });
+};
