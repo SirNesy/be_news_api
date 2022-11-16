@@ -77,10 +77,49 @@ describe("/api/articles", () => {
   });
   test("GET - status:404, not found", () => {
     return request(app)
-      .get("/api/articles/badrequest")
+
+      .get("/api/articlesbadrequest")
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toBe("invalid URL!");
       });
   });
 });
+
+describe("/api/articles/:article_id", () => {
+  test("GET: 200 - get an article from the articles table by a specified article_id", () => {
+    return request(app)
+      .get(`/api/articles/2`)
+      .expect(200)
+      .then((res) => {
+        const { result } = res.body;
+        console.log(result);
+        expect(result).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          body: expect.any(String),
+          article_id: 2,
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+        });
+      });
+  });
+  test("GET - status 400, Invalid sort query ", () => {
+    return request(app)
+      .get("/api/articles/notAnId")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid sort query!");
+      });
+  });
+  test("GET - status 404, Not found ", () => {
+    return request(app)
+      .get("/api/articles/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found!");
+      });
+  });
+});
+
