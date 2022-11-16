@@ -96,7 +96,7 @@ describe("/api/articles/:article_id", () => {
           author: expect.any(String),
           title: expect.any(String),
           body: expect.any(String),
-          article_id: expect.any(Number),
+          article_id: 2,
           topic: expect.any(String),
           created_at: expect.any(String),
           votes: expect.any(Number),
@@ -109,6 +109,14 @@ describe("/api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("invalid sort query!");
+      });
+  });
+  test("GET - status 404, Not found ", () => {
+    return request(app)
+      .get("/api/articles/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found!");
       });
   });
 });
