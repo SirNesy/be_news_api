@@ -88,7 +88,7 @@ describe("/api/articles", () => {
 describe("/api/articles/:article_id", () => {
   test("GET: 200 - get an article from the articles table by a specified article_id", () => {
     return request(app)
-      .get(`/api/articles/2`)
+      .get("/api/articles/2")
       .expect(200)
       .then((res) => {
         const { result } = res.body;
@@ -140,12 +140,13 @@ describe("/api/articles/:article_id/comments", () => {
         });
       });
   });
-  test("GET - 404, To get an empty array of valid article Id", () => {
+  test("GET - 200, valid article Id but comment not found", () => {
     return request(app)
       .get("/api/articles/2/comments")
-      .expect(404)
+      .expect(200)
       .then(({ body }) => {
-        expect(body.msg).toBe("article id does not exist");
+        const { comments } = body;
+        expect(comments).toEqual([]);
       });
   });
   test("GET - 404, valid but non-existing article Id", () => {
@@ -153,7 +154,7 @@ describe("/api/articles/:article_id/comments", () => {
       .get("/api/articles/99999/comments")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toEqual("article id does not exist");
+        expect(body.msg).toEqual("Article not found!");
       });
   });
   test("GET - 400, invalid sort query", () => {
