@@ -77,7 +77,6 @@ describe("/api/articles", () => {
   });
   test("GET - status:404, not found", () => {
     return request(app)
-
       .get("/api/articlesbadrequest")
       .expect(404)
       .then((res) => {
@@ -89,11 +88,10 @@ describe("/api/articles", () => {
 describe("/api/articles/:article_id", () => {
   test("GET: 200 - get an article from the articles table by a specified article_id", () => {
     return request(app)
-      .get(`/api/articles/2`)
+      .get("/api/articles/2")
       .expect(200)
       .then((res) => {
         const { result } = res.body;
-        console.log(result);
         expect(result).toMatchObject({
           author: expect.any(String),
           title: expect.any(String),
@@ -123,3 +121,48 @@ describe("/api/articles/:article_id", () => {
   });
 });
 
+describe("/api/articles/:article_id/comments", () => {
+  test("GET - 200, To get comments with valid article_id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            article_id: 1,
+            votes: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("GET - 200, valid article Id but comment not found", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toEqual([]);
+      });
+  });
+  test("GET - 404, valid but non-existing article Id", () => {
+    return request(app)
+      .get("/api/articles/99999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Article not found!");
+      });
+  });
+  test("GET - 400, invalid article Id!", () => {
+    return request(app)
+      .get("/api/articles/notId/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid article Id!");
+      });
+  });
+});

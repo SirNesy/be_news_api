@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkIfArticleExists } = require("../db/seeds/utils");
 
 exports.selectedTopics = () => {
   return db.query("SELECT * FROM topics").then((response) => {
@@ -42,4 +43,20 @@ exports.fetchArticleById = (article_id) => {
     status: 400,
     msg: "invalid sort query!",
   });
+};
+
+exports.fetchCommentsById = (article_id) => {
+  if (!isNaN(article_id)) {
+    return checkIfArticleExists(article_id)
+      .then(() => {
+        return db.query(
+          `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`,
+          [article_id]
+        );
+      })
+      .then((result) => {
+        return result.rows;
+      });
+  }
+  return Promise.reject({ status: 400, msg: "invalid article Id!" });
 };
