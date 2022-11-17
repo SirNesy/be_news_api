@@ -58,5 +58,5 @@ exports.fetchCommentsById = (article_id) => {
         return result.rows;
       });
   }
-  return Promise.reject({ status: 400, msg: "invalid sort query!" });
+  return Promise.reject({ status: 400, msg: "invalid article Id!" });
 };

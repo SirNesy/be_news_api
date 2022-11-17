@@ -157,12 +157,12 @@ describe("/api/articles/:article_id/comments", () => {
         expect(body.msg).toEqual("Article not found!");
       });
   });
-  test("GET - 400, invalid sort query", () => {
+  test("GET - 400, invalid article Id!", () => {
     return request(app)
       .get("/api/articles/notId/comments")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("invalid sort query!");
+        expect(body.msg).toBe("invalid article Id!");
       });
   });
 });
