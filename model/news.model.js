@@ -1,5 +1,8 @@
 const db = require("../db/connection");
-const { checkIfArticleExists } = require("../db/seeds/utils");
+const {
+  checkIfArticleExists,
+  checkIfUsernameExists,
+} = require("../db/seeds/utils");
 
 exports.selectedTopics = () => {
   return db.query("SELECT * FROM topics").then((response) => {
@@ -66,15 +69,21 @@ exports.insertCommentById = (article_id, comment) => {
   if (!username || !body) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
+  if (isNaN(article_id)) {
+    return Promise.reject({ status: 400, msg: "invalid article Id!" });
+  }
+
   return checkIfArticleExists(article_id).then(() => {
-    return db
-      .query(
-        `INSERT INTO comments (author, body, article_id)
-    VALUES ($1,$2,$3) RETURNING *;`,
-        [username, body, article_id]
-      )
-      .then((res) => {
-        return res.rows[0];
-      });
+    return checkIfUsernameExists(username).then(() => {
+      return db
+        .query(
+          `INSERT INTO comments (author, body, article_id)
+      VALUES ($1,$2,$3) RETURNING *;`,
+          [username, body, article_id]
+        )
+        .then((res) => {
+          return res.rows[0];
+        });
+    });
   });
 };

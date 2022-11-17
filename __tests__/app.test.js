@@ -179,7 +179,6 @@ describe(" POST /api/articles/:article_id/comments", () => {
       .expect(201)
       .then(({ body }) => {
         const expected = body.comment;
-        console.log(body.comment);
         expect(expected).toMatchObject({
           body: expect.any(String),
           article_id: 1,
@@ -211,6 +210,32 @@ describe(" POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("POST -status 404, Username not found ", () => {
+    const sentComment = {
+      username: "onesi",
+      body: "What a good book",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(sentComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Username not found!");
+      });
+  });
+  test("POST - 400, invalid article Id!", () => {
+    const sentComment = {
+      username: "lurker",
+      body: "What a good book",
+    };
+    return request(app)
+      .post("/api/articles/notId/comments")
+      .send(sentComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid article Id!");
       });
   });
 });
