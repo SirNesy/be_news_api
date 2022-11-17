@@ -166,3 +166,51 @@ describe("/api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe(" POST /api/articles/:article_id/comments", () => {
+  test("POST 201, for valid id and responds with post comment", () => {
+    const sentComment = {
+      username: "lurker",
+      body: "exceptional piece of work",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(sentComment)
+      .expect(201)
+      .then(({ body }) => {
+        const expected = body.comment;
+        console.log(body.comment);
+        expect(expected).toMatchObject({
+          body: expect.any(String),
+          article_id: 1,
+          author: "lurker",
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+          comment_id: expect.any(Number),
+        });
+      });
+  });
+  test("POST - Status 400, Bad Request", () => {
+    const sentComment = {
+      username: "lurker",
+      body: "Nice work northcoders!",
+    };
+    return request(app)
+      .post("/api/articles/-1/comments")
+      .send(sentComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found!");
+      });
+  });
+  test("POST -status 400, ", () => {
+    const sentComment = {};
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(sentComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+});

@@ -60,3 +60,21 @@ exports.fetchCommentsById = (article_id) => {
   }
   return Promise.reject({ status: 400, msg: "invalid article Id!" });
 };
+
+exports.insertCommentById = (article_id, comment) => {
+  const { username, body } = comment;
+  if (!username || !body) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+  return checkIfArticleExists(article_id).then(() => {
+    return db
+      .query(
+        `INSERT INTO comments (author, body, article_id)
+    VALUES ($1,$2,$3) RETURNING *;`,
+        [username, body, article_id]
+      )
+      .then((res) => {
+        return res.rows[0];
+      });
+  });
+};
