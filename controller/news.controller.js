@@ -58,8 +58,8 @@ exports.getPatchedArticleById = (req, res, next) => {
   const { article_id } = req.params;
   const votes = req.body;
   patchedArticleById(article_id, votes)
-    .then((updatedArticles) => {
-      res.status(201).send({ articles: updatedArticles });
+    .then((updatedArticle) => {
+      res.status(201).send({ article: updatedArticle });
     })
     .catch((err) => {
       next(err);

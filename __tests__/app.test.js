@@ -248,8 +248,8 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(votesIncrement)
       .expect(201)
       .then(({ body }) => {
-        const { articles } = body;
-        expect(articles).toMatchObject({
+        const { article } = body;
+        expect(article).toMatchObject({
           body: expect.any(String),
           article_id: 1,
           author: "butter_bridge",
