@@ -110,3 +110,4 @@ exports.patchedArticleById = (article_id, votes) => {
       });
   });
 };
+//
