@@ -66,7 +66,7 @@ describe("/api/articles", () => {
         });
       });
   });
-  test("GET - status 200, responds with a Decending sorted order value ", () => {
+  test("GET - status: 200, responds with a Decending sorted order value ", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -86,7 +86,7 @@ describe("/api/articles", () => {
 });
 
 describe("/api/articles/:article_id", () => {
-  test("GET: 200 - get an article from the articles table by a specified article_id", () => {
+  test("GET - status: 200 - get an article from the articles table by a specified article_id", () => {
     return request(app)
       .get("/api/articles/2")
       .expect(200)
@@ -103,7 +103,7 @@ describe("/api/articles/:article_id", () => {
         });
       });
   });
-  test("GET - status 400, Invalid sort query ", () => {
+  test("GET - status: 400, Invalid sort query ", () => {
     return request(app)
       .get("/api/articles/notAnId")
       .expect(400)
@@ -111,7 +111,7 @@ describe("/api/articles/:article_id", () => {
         expect(body.msg).toBe("invalid sort query!");
       });
   });
-  test("GET - status 404, Not found ", () => {
+  test("GET - status: 404, Not found ", () => {
     return request(app)
       .get("/api/articles/999")
       .expect(404)
@@ -122,7 +122,7 @@ describe("/api/articles/:article_id", () => {
 });
 
 describe("/api/articles/:article_id/comments", () => {
-  test("GET - 200, To get comments with valid article_id", () => {
+  test("GET - status: 200, To get comments with valid article_id", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
@@ -140,7 +140,7 @@ describe("/api/articles/:article_id/comments", () => {
         });
       });
   });
-  test("GET - 200, valid article Id but comment not found", () => {
+  test("GET - status: 200, valid article Id but comment not found", () => {
     return request(app)
       .get("/api/articles/2/comments")
       .expect(200)
@@ -149,7 +149,7 @@ describe("/api/articles/:article_id/comments", () => {
         expect(comments).toEqual([]);
       });
   });
-  test("GET - 404, valid but non-existing article Id", () => {
+  test("GET - status: 404, valid but non-existing article Id", () => {
     return request(app)
       .get("/api/articles/99999/comments")
       .expect(404)
@@ -157,7 +157,7 @@ describe("/api/articles/:article_id/comments", () => {
         expect(body.msg).toEqual("Article not found!");
       });
   });
-  test("GET - 400, invalid article Id!", () => {
+  test("GET - status: 400, invalid article Id!", () => {
     return request(app)
       .get("/api/articles/notId/comments")
       .expect(400)
@@ -168,7 +168,7 @@ describe("/api/articles/:article_id/comments", () => {
 });
 
 describe(" POST /api/articles/:article_id/comments", () => {
-  test("POST 201, for valid id and responds with post comment", () => {
+  test("POST - status: 201, for valid id and responds with post comment", () => {
     const sentComment = {
       username: "lurker",
       body: "exceptional piece of work",
@@ -189,7 +189,7 @@ describe(" POST /api/articles/:article_id/comments", () => {
         });
       });
   });
-  test("POST - Status 400, Bad Request", () => {
+  test("POST - status: 404, Bad Request", () => {
     const sentComment = {
       username: "lurker",
       body: "Nice work northcoders!",
@@ -202,7 +202,7 @@ describe(" POST /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Article not found!");
       });
   });
-  test("POST -status 400, ", () => {
+  test("POST - status: 400, ", () => {
     const sentComment = {};
     return request(app)
       .post("/api/articles/1/comments")
@@ -212,7 +212,7 @@ describe(" POST /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Bad request");
       });
   });
-  test("POST -status 404, Username not found ", () => {
+  test("POST - status: 404, Username not found ", () => {
     const sentComment = {
       username: "onesi",
       body: "What a good book",
@@ -225,7 +225,7 @@ describe(" POST /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Username not found!");
       });
   });
-  test("POST - 400, invalid article Id!", () => {
+  test("POST - status: 400, invalid article Id!", () => {
     const sentComment = {
       username: "lurker",
       body: "What a good book",
@@ -236,6 +236,46 @@ describe(" POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("invalid article Id!");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  const votesIncrement = { inc_votes: 10 };
+  test("PATCH - status: 201, should update votes of article id", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votesIncrement)
+      .expect(201)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toMatchObject({
+          body: expect.any(String),
+          article_id: 1,
+          author: "butter_bridge",
+          votes: 110,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("PATCH - status: 400, should return 400 bad request when malformed body", () => {
+    const votesIncrement = {};
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votesIncrement)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request!");
+      });
+  });
+  test("PATCH -status:400, should return bad request when body has incorrect data type", () => {
+    const votesIncrement = { inc_votes: "lol" };
+    return request(app)
+      .patch("/api/articles/2")
+      .send(votesIncrement)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request wrong data type!");
       });
   });
 });
