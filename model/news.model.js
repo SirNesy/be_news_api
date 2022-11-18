@@ -29,39 +29,39 @@ exports.fetchedArticles = (sort_by = "created_at") => {
 };
 
 exports.fetchArticleById = (article_id) => {
-  if (!isNaN(article_id)) {
-    return db
-      .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
-      .then((result) => {
-        if (result.rows.length === 0) {
-          return Promise.reject({
-            status: 404,
-            msg: "Not found!",
-          });
-        }
-        return result.rows[0];
-      });
+  if (isNaN(article_id)) {
+    return Promise.reject({
+      status: 400,
+      msg: "invalid sort query!",
+    });
   }
-  return Promise.reject({
-    status: 400,
-    msg: "invalid sort query!",
-  });
+  return db
+    .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Not found!",
+        });
+      }
+      return result.rows[0];
+    });
 };
 
 exports.fetchCommentsById = (article_id) => {
-  if (!isNaN(article_id)) {
-    return checkIfArticleExists(article_id)
-      .then(() => {
-        return db.query(
-          `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`,
-          [article_id]
-        );
-      })
-      .then((result) => {
-        return result.rows;
-      });
+  if (isNaN(article_id)) {
+    return Promise.reject({ status: 400, msg: "invalid article Id!" });
   }
-  return Promise.reject({ status: 400, msg: "invalid article Id!" });
+  return checkIfArticleExists(article_id)
+    .then(() => {
+      return db.query(
+        `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`,
+        [article_id]
+      );
+    })
+    .then((result) => {
+      return result.rows;
+    });
 };
 
 exports.insertCommentById = (article_id, comment) => {
@@ -72,18 +72,42 @@ exports.insertCommentById = (article_id, comment) => {
   if (isNaN(article_id)) {
     return Promise.reject({ status: 400, msg: "invalid article Id!" });
   }
-
-  return checkIfArticleExists(article_id).then(() => {
-    return checkIfUsernameExists(username).then(() => {
-      return db
-        .query(
-          `INSERT INTO comments (author, body, article_id)
+  return Promise.all([
+    checkIfArticleExists(article_id),
+    checkIfUsernameExists(username),
+  ]).then(() => {
+    return db
+      .query(
+        `INSERT INTO comments (author, body, article_id)
       VALUES ($1,$2,$3) RETURNING *;`,
-          [username, body, article_id]
-        )
-        .then((res) => {
-          return res.rows[0];
-        });
-    });
+        [username, body, article_id]
+      )
+      .then((res) => {
+        return res.rows[0];
+      });
   });
 };
+
+exports.patchedArticleById = (article_id, votes) => {
+  const { inc_votes } = votes;
+  if (!inc_votes || !votes.hasOwnProperty("inc_votes")) {
+    return Promise.reject({ status: 400, msg: "Bad request!" });
+  }
+  if (isNaN(inc_votes)) {
+    return Promise.reject({ status: 400, msg: "Bad request wrong data type!" });
+  }
+  if (isNaN(article_id)) {
+    return Promise.reject({ status: 400, msg: "Bad request!" });
+  }
+  return checkIfArticleExists(article_id).then(() => {
+    return db
+      .query(
+        `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
+        [inc_votes, article_id]
+      )
+      .then((res) => {
+        return res.rows[0];
+      });
+  });
+};
+//
