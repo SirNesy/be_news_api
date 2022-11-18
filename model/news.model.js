@@ -90,24 +90,22 @@ exports.insertCommentById = (article_id, comment) => {
 
 exports.patchedArticleById = (article_id, votes) => {
   const { inc_votes } = votes;
-  if (!inc_votes || !votes.hasOwnProperty("inc_votes")) {
-    return Promise.reject({ status: 400, msg: "Bad request!" });
-  }
-  if (isNaN(inc_votes)) {
-    return Promise.reject({ status: 400, msg: "Bad request wrong data type!" });
-  }
-  if (isNaN(article_id)) {
-    return Promise.reject({ status: 400, msg: "Bad request!" });
-  }
-  return checkIfArticleExists(article_id).then(() => {
-    return db
-      .query(
-        `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
-        [inc_votes, article_id]
-      )
-      .then((res) => {
-        return res.rows[0];
-      });
+
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
+      [inc_votes, article_id]
+    )
+    .then((res) => {
+      if (res.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Article not found!" });
+      }
+      return res.rows[0];
+    });
+};
+
+exports.selectedUsers = () => {
+  return db.query(`SELECT * FROM users`).then((users) => {
+    return users.rows;
   });
 };
-//
