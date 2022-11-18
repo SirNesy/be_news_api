@@ -96,6 +96,9 @@ exports.patchedArticleById = (article_id, votes) => {
   if (isNaN(inc_votes)) {
     return Promise.reject({ status: 400, msg: "Bad request wrong data type!" });
   }
+  if (isNaN(article_id)) {
+    return Promise.reject({ status: 400, msg: "Bad request!" });
+  }
   return checkIfArticleExists(article_id).then(() => {
     return db
       .query(

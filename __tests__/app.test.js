@@ -278,4 +278,24 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.msg).toBe("Bad request wrong data type!");
       });
   });
+  test("PATCH -status:400, should return Bad request, wrong data type when article id is not a number!", () => {
+    const votesIncrement = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/joker")
+      .send(votesIncrement)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request!");
+      });
+  });
+  test("PATCH -status:400, should return article id not found!", () => {
+    const votesIncrement = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/-1")
+      .send(votesIncrement)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found!");
+      });
+  });
 });
