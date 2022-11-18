@@ -318,12 +318,4 @@ describe(" GET /api/users ", () => {
         expect(users.length).toBe(4);
       });
   });
-  test("GET - status:404, not found", () => {
-    return request(app)
-      .get("/api/users/badrequest")
-      .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("invalid URL!");
-      });
-  });
 });
