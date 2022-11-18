@@ -41,3 +41,13 @@ exports.checkIfUsernameExists = (username) => {
       }
     });
 };
+
+exports.checkIfTopicExists = (topic) => {
+  return db
+    .query(`SELECT * FROM topics where slug =$1;`, [topic])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Topic not found!" });
+      }
+    });
+};

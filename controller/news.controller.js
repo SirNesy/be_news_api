@@ -17,12 +17,14 @@ exports.getTopics = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const { sort_by } = req.query;
-  fetchedArticles(sort_by)
+  const { sort_by, order, topic } = req.query;
+  fetchedArticles(sort_by, order, topic)
     .then((articles) => {
       res.status(200).send({ articles });
     })
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getArticleById = (req, res, next) => {

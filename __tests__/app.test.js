@@ -66,21 +66,67 @@ describe("/api/articles", () => {
         });
       });
   });
-  test("GET - status: 200, responds with a Decending sorted order value ", () => {
+  test("GET - status: 200, responds with a Decending sorted order value of time created ", () => {
     return request(app)
-      .get("/api/articles")
+      .get("/api/articles?sort_by=created_at")
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
         expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
+  test("GET - status: 200, should respond with filtered topic specified", () => {
+    return request(app)
+      .get("/api/articles/?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+  test("GET - status: 200, respond with articles in ascending order when order by is provided", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at");
+      });
+  });
+  test("GET - status: 200, respond with an empty array when topic valid  with but no articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toEqual([]);
+      });
+  });
+
   test("GET - status:404, not found", () => {
     return request(app)
       .get("/api/articlesbadrequest")
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toBe("invalid URL!");
+      });
+  });
+  test("GET - status: 400, responds with invalid sort query ", () => {
+    return request(app)
+      .get("/api/articles?sort_by=lol")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("invalid sort query!");
+      });
+  });
+  test("GET - status: 400, responds with invalid sort query ", () => {
+    return request(app)
+      .get("/api/articles?order=apple")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("invalid sort query!");
       });
   });
 });
