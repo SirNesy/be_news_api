@@ -130,7 +130,7 @@ describe("/api/articles", () => {
       });
   });
 });
-
+//
 describe("/api/articles/:article_id", () => {
   test("GET - status: 200 - get an article from the articles table by a specified article_id", () => {
     return request(app)
