@@ -275,7 +275,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(votesIncrement)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad request wrong data type!");
+        expect(body.msg).toBe("Bad request!");
       });
   });
   test("PATCH -status:400, should return Bad request, wrong data type when article id is not a number!", () => {
@@ -288,7 +288,7 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.msg).toBe("Bad request!");
       });
   });
-  test("PATCH -status:400, should return article id not found!", () => {
+  test("PATCH -status:404, should return article id not found!", () => {
     const votesIncrement = { inc_votes: 10 };
     return request(app)
       .patch("/api/articles/-1")
@@ -296,6 +296,26 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Article not found!");
+      });
+  });
+});
+
+describe(" GET /api/users ", () => {
+  test("GET - status:200, responds with an array of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toBeInstanceOf(Array);
+        users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+        expect(users.length).toBe(4);
       });
   });
 });

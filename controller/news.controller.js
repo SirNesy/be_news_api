@@ -5,6 +5,7 @@ const {
   fetchCommentsById,
   insertCommentById,
   patchedArticleById,
+  selectedUsers,
 } = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
@@ -64,4 +65,12 @@ exports.getPatchedArticleById = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.getUsers = (req, res, next) => {
+  selectedUsers()
+    .then((result) => {
+      res.status(200).send({ users: result });
+    })
+    .catch(next);
 };
