@@ -45,7 +45,7 @@ describe(" GET /api/topics ", () => {
 });
 
 describe("/api/articles", () => {
-  test("GET - status:200, responds with an article array of object", () => {
+  test("GET - status:200, responds with an article array with comment_count included in each article object", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -72,6 +72,7 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
+        // console.log(articles);
         expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
@@ -125,27 +126,39 @@ describe("/api/articles", () => {
     return request(app)
       .get("/api/articles?order=apple")
       .expect(400)
-      .then((res) => {
-        expect(res.body.msg).toBe("invalid sort query!");
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid sort query!");
       });
   });
+  //   test("GET - status: 404, responds with Topic not found", () => {
+  //     return request(app)
+  //       .get("/api/articles?topic=nesy")
+  //       .expect(404)
+  //       .then(({ body }) => {
+  //         expect(body.msg).toBe("Topic not found!");
+  //       });
+  //   });
 });
 //
 describe("/api/articles/:article_id", () => {
   test("GET - status: 200 - get an article from the articles table by a specified article_id", () => {
     return request(app)
-      .get("/api/articles/2")
+      .get("/api/articles/1")
       .expect(200)
-      .then((res) => {
-        const { result } = res.body;
-        expect(result).toMatchObject({
-          author: expect.any(String),
-          title: expect.any(String),
-          body: expect.any(String),
-          article_id: 2,
-          topic: expect.any(String),
-          created_at: expect.any(String),
-          votes: expect.any(Number),
+      .then(({ body }) => {
+        const { results } = body;
+        results.forEach((result) => {
+          //   console.log(result);
+          expect(result).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            body: expect.any(String),
+            article_id: 1,
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_count: expect.any(Number),
+          });
         });
       });
   });
@@ -162,7 +175,7 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/999")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Not found!");
+        expect(body.msg).toBe("Article not found!");
       });
   });
 });
@@ -363,5 +376,32 @@ describe(" GET /api/users ", () => {
         });
         expect(users.length).toBe(4);
       });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("DELETE status: 204, respond with empty object", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({});
+      });
+  });
+  test("GET status: 404, reponds with comment id not found ", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Comment id not found!");
+      });
+  });
+  test("GET status:400, responds with 400 bad request", () => {
+    return request(app)
+      .delete("/api/comments/notANumber")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request!");
+      });   
   });
 });

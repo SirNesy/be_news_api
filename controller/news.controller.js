@@ -6,6 +6,7 @@ const {
   insertCommentById,
   patchedArticleById,
   selectedUsers,
+  getDeletedCommentsById,
 } = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
@@ -30,10 +31,12 @@ exports.getArticles = (req, res, next) => {
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
   fetchArticleById(article_id)
-    .then((result) => {
-      res.status(200).send({ result });
+    .then((results) => {
+      res.status(200).send({ results });
     })
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getCommentsById = (req, res, next) => {
@@ -42,7 +45,9 @@ exports.getCommentsById = (req, res, next) => {
     .then((comments) => {
       res.status(200).send({ comments });
     })
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.postedCommentById = (req, res, next) => {
@@ -75,4 +80,15 @@ exports.getUsers = (req, res, next) => {
       res.status(200).send({ users: result });
     })
     .catch(next);
+};
+
+exports.deleteCommentsById = (req, res, next) => {
+  const { comment_id } = req.params;
+  getDeletedCommentsById(comment_id)
+    .then(() => {
+      res.status(204).send({});
+    })
+    .catch((err) => {
+      next(err);
+    });
 };

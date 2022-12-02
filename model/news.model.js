@@ -2,7 +2,6 @@ const db = require("../db/connection");
 const {
   checkIfArticleExists,
   checkIfUsernameExists,
-  checkIfTopicExists,
 } = require("../db/seeds/utils");
 
 exports.selectedTopics = () => {
@@ -45,17 +44,14 @@ exports.fetchArticleById = (article_id) => {
       msg: "invalid sort query!",
     });
   }
-  return db
-    .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
-    .then((result) => {
-      if (result.rows.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: "Not found!",
-        });
-      }
-      return result.rows[0];
-    });
+  let queryStr = `SELECT articles.*, COUNT(comments.article_id)::INT AS comment_count FROM articles
+  LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id = $1 GROUP BY comments.article_id, articles.article_id;`;
+  return db.query(queryStr, [article_id]).then((res) => {
+    if (res.rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "Article not found!" });
+    }
+    return res.rows;
+  });
 };
 
 exports.fetchCommentsById = (article_id) => {
@@ -118,4 +114,17 @@ exports.selectedUsers = () => {
   return db.query(`SELECT * FROM users`).then((users) => {
     return users.rows;
   });
+};
+
+exports.getDeletedCommentsById = (comment_id) => {
+  return db
+    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *;`, [
+      comment_id,
+    ])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Comment id not found!" });
+      }
+      return result.rows[0];
+    });
 };

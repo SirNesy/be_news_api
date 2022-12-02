@@ -8,6 +8,7 @@ const {
   postedCommentById,
   getPatchedArticleById,
   getUsers,
+  deleteCommentsById,
 } = require("./controller/news.controller");
 const app = express();
 app.use(express.json());
@@ -25,6 +26,10 @@ app.post("/api/articles/:article_id/comments", postedCommentById);
 app.patch("/api/articles/:article_id", getPatchedArticleById);
 
 app.get("/api/users", getUsers);
+
+app.delete("/api/comments/:comment_id", deleteCommentsById);
+
+app.get("/api");
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "invalid URL!" });
