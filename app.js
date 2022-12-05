@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 
 const {
   getTopics,
@@ -11,6 +12,7 @@ const {
   deleteCommentsById,
 } = require("./controller/news.controller");
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.get("/api/topics", getTopics);
