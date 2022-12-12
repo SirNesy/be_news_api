@@ -18,6 +18,7 @@ exports.fetchedArticles = (sort_by = "created_at", order = "desc", topic) => {
     "author",
     "body",
     "votes",
+    "comment_count",
   ];
   const validOrder = ["asc", "desc"];
   if (!validColumns.includes(sort_by) || !validOrder.includes(order)) {
